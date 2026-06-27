@@ -8,7 +8,7 @@ version = "0.4.0"
 description = "A GeoServer MCP server implementation that enhances LLM capabilities with geospatial data and mapping services via GeoServer REST API"
 readme = "README.md"
 requires-python = ">=3.10"
-license = {file = "LICENSE"}
+license = {text = "MIT"}
 authors = [
     {name = "Mahdi Nazari Ashani"},
     {name = "GeoServer MCP Contributors"},
