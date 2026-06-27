@@ -31,6 +31,8 @@ services:
       - POSTGRES_PASS=${POSTGIS_PASS:-geoserver}
       - ALLOW_IP_RANGE=0.0.0.0/0
       - POSTGRES_MULTIPLE_EXTENSIONS=postgis
+    ports:
+      - '127.0.0.1:5433:5432'
     volumes:
       - postgis-data:/var/lib/postgresql
     networks:
