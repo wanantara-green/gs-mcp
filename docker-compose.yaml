@@ -46,7 +46,10 @@ services:
 
   # ── GeoServer ─────────────────────────────────────────
   geoserver:
-    image: kartoza/geoserver:latest
+    # Versi DI-PIN (immutable). Sebelumnya ":latest" → auto-upgrade ke major
+    # version baru me-reinit /opt/geoserver_data sehingga katalog (workspace,
+    # layer, style) hilang saat redeploy. Pin mencegah hal itu terulang.
+    image: kartoza/geoserver:3.0.0--v2026.06.25
     depends_on:
       postgis:
         condition: service_healthy
@@ -67,6 +70,33 @@ services:
       timeout: 10s
       retries: 10
     restart: unless-stopped
+
+  # ── GeoServer Auto-Provisioner (self-healing) ─────────
+  # Membangun ulang katalog GeoServer (workspace + datastore PostGIS +
+  # 30 layer + 30 SLD) secara IDEMPOTEN setiap deploy. Jika katalog sudah
+  # lengkap, langsung skip. Mencegah "workspace hilang" saat volume
+  # geoserver-data ter-reset — data mentah tetap aman di PostGIS.
+  geoserver-init:
+    image: python:3.12-slim
+    depends_on:
+      geoserver:
+        condition: service_healthy
+    environment:
+      - GEOSERVER_URL=${GEOSERVER_URL:-http://geoserver:8080/geoserver}
+      - GEOSERVER_USER=${GEOSERVER_USER:-admin}
+      - GEOSERVER_PASSWORD=${GEOSERVER_PASSWORD:-geoserver}
+      - GEOSERVER_WORKSPACE=${GEOSERVER_WORKSPACE:-zonasiluwu}
+      - PG_HOST=postgis
+      - PG_PORT=5432
+      - PG_DB=${POSTGIS_DB:-geoserver}
+      - PG_USER=${POSTGIS_USER:-geoserver}
+      - PG_PASS=${POSTGIS_PASS:-geoserver}
+    volumes:
+      - ./init:/init:ro
+    command: ["python", "/init/init.py"]
+    networks:
+      - app-net
+    restart: "no"
 
   # ── GeoServer MCP (SSE) ───────────────────────────────
   geoserver-mcp:
