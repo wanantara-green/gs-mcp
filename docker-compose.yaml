@@ -119,6 +119,32 @@ services:
       - app-net
     restart: unless-stopped
 
+  # ── GS AI Bridge (DeepSeek + GeoServer read-only) ─────
+  # Jembatan aman untuk map.html: terima POST /ask, panggil DeepSeek (key
+  # server-side), eksekusi HANYA 4 tool GeoServer read-only via geoserver-mcp,
+  # balas jawaban bahasa natural. CORS dikunci ke training-02.
+  gs-ai-bridge:
+    build:
+      context: ./gs-ai-bridge
+      dockerfile: Dockerfile
+    image: gs-ai-bridge:local
+    environment:
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}                  # set di Coolify, JANGAN commit
+      - DEEPSEEK_MODEL=${DEEPSEEK_MODEL:-deepseek-chat}
+      - DEEPSEEK_BASE_URL=${DEEPSEEK_BASE_URL:-https://api.deepseek.com}
+      - GEOSERVER_MCP_SSE_URL=${GEOSERVER_MCP_SSE_URL:-http://geoserver-mcp:8000/sse}
+      - GEOSERVER_WORKSPACE=${GEOSERVER_WORKSPACE:-zonasiluwu}
+      - ALLOWED_ORIGIN=${ALLOWED_ORIGIN:-https://training-02.wanantara.org}
+    expose:
+      - "8080"                       # Traefik attach HTTPS domain (mis. gs-ai.app.wanantara.org)
+    ports:
+      - "127.0.0.1:8082:8080"        # opsional: debug lokal saja
+    depends_on:
+      - geoserver-mcp
+    networks:
+      - app-net
+    restart: unless-stopped
+
 networks:
   app-net:
     driver: bridge
