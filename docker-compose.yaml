@@ -52,6 +52,8 @@ services:
         condition: service_healthy
     ports:
       - "9597:8080"
+    expose:
+      - "8080"
     environment:
       - GEOSERVER_ADMIN_USER=${GEOSERVER_ADMIN_USER:-admin}
       - GEOSERVER_ADMIN_PASSWORD=${GEOSERVER_ADMIN_PASSWORD:-geoserver}
