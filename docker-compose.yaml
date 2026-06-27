@@ -136,9 +136,7 @@ services:
       - GEOSERVER_WORKSPACE=${GEOSERVER_WORKSPACE:-zonasiluwu}
       - ALLOWED_ORIGIN=${ALLOWED_ORIGIN:-https://training-02.wanantara.org}
     expose:
-      - "8080"                       # Traefik attach HTTPS domain (mis. gs-ai.app.wanantara.org)
-    ports:
-      - "127.0.0.1:8082:8080"        # opsional: debug lokal saja
+      - "8080"                       # satu-satunya port → Traefik route ke 8080 (HTTPS domain via Coolify)
     depends_on:
       - geoserver-mcp
     networks:
