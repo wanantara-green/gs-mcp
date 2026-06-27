@@ -77,7 +77,7 @@ services:
       - GEOSERVER_PASSWORD=${GEOSERVER_PASSWORD:-geoserver}
       - GEOSERVER_WORKSPACE=${GEOSERVER_WORKSPACE:-zonasiluwu}
     ports:
-      - "127.0.0.1:8000:8000"       # SSE endpoint
+      - "127.0.0.1:8001:8000"       # SSE endpoint (port 8000 conflict with Coolify API)
     depends_on:
       geoserver:
         condition: service_healthy
