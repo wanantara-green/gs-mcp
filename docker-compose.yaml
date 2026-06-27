@@ -46,7 +46,10 @@ services:
 
   # ── GeoServer ─────────────────────────────────────────
   geoserver:
-    image: kartoza/geoserver:latest
+    # Versi DI-PIN (immutable). Sebelumnya ":latest" → auto-upgrade ke major
+    # version baru me-reinit /opt/geoserver_data sehingga katalog (workspace,
+    # layer, style) hilang saat redeploy. Pin mencegah hal itu terulang.
+    image: kartoza/geoserver:3.0.0--v2026.06.25
     depends_on:
       postgis:
         condition: service_healthy
@@ -68,6 +71,33 @@ services:
       retries: 10
     restart: unless-stopped
 
+  # ── GeoServer Auto-Provisioner (self-healing) ─────────
+  # Membangun ulang katalog GeoServer (workspace + datastore PostGIS +
+  # 30 layer + 30 SLD) secara IDEMPOTEN setiap deploy. Jika katalog sudah
+  # lengkap, langsung skip. Mencegah "workspace hilang" saat volume
+  # geoserver-data ter-reset — data mentah tetap aman di PostGIS.
+  geoserver-init:
+    image: python:3.12-slim
+    depends_on:
+      geoserver:
+        condition: service_healthy
+    environment:
+      - GEOSERVER_URL=${GEOSERVER_URL:-http://geoserver:8080/geoserver}
+      - GEOSERVER_USER=${GEOSERVER_USER:-admin}
+      - GEOSERVER_PASSWORD=${GEOSERVER_PASSWORD:-geoserver}
+      - GEOSERVER_WORKSPACE=${GEOSERVER_WORKSPACE:-zonasiluwu}
+      - PG_HOST=postgis
+      - PG_PORT=5432
+      - PG_DB=${POSTGIS_DB:-geoserver}
+      - PG_USER=${POSTGIS_USER:-geoserver}
+      - PG_PASS=${POSTGIS_PASS:-geoserver}
+    volumes:
+      - ./init:/init:ro
+    command: ["python", "/init/init.py"]
+    networks:
+      - app-net
+    restart: "no"
+
   # ── GeoServer MCP (SSE) ───────────────────────────────
   geoserver-mcp:
     build:
@@ -85,6 +115,32 @@ services:
     depends_on:
       geoserver:
         condition: service_healthy
+    networks:
+      - app-net
+    restart: unless-stopped
+
+  # ── GS AI Bridge (DeepSeek + GeoServer read-only) ─────
+  # Jembatan aman untuk map.html: terima POST /ask, panggil DeepSeek (key
+  # server-side), eksekusi HANYA 4 tool GeoServer read-only via geoserver-mcp,
+  # balas jawaban bahasa natural. CORS dikunci ke training-02.
+  gs-ai-bridge:
+    build:
+      context: ./gs-ai-bridge
+      dockerfile: Dockerfile
+    image: gs-ai-bridge:local
+    environment:
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}                  # set di Coolify, JANGAN commit
+      - DEEPSEEK_MODEL=${DEEPSEEK_MODEL:-deepseek-chat}
+      - DEEPSEEK_BASE_URL=${DEEPSEEK_BASE_URL:-https://api.deepseek.com}
+      - GEOSERVER_MCP_SSE_URL=${GEOSERVER_MCP_SSE_URL:-http://geoserver-mcp:8000/sse}
+      - GEOSERVER_WORKSPACE=${GEOSERVER_WORKSPACE:-zonasiluwu}
+      - ALLOWED_ORIGIN=${ALLOWED_ORIGIN:-https://training-02.wanantara.org}
+    expose:
+      - "8080"                       # Traefik attach HTTPS domain (mis. gs-ai.app.wanantara.org)
+    ports:
+      - "127.0.0.1:8082:8080"        # opsional: debug lokal saja
+    depends_on:
+      - geoserver-mcp
     networks:
       - app-net
     restart: unless-stopped
