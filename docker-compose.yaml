@@ -67,8 +67,8 @@ services:
   # ── GeoServer MCP (SSE) ───────────────────────────────
   geoserver-mcp:
     build:
-      # Build context mengarah ke proyek geoserver-mcp yang berisi Dockerfile
-      context: .
+      # Build context mengarah ke folder geoserver-mcp dalam repo ini
+      context: ./geoserver-mcp
       dockerfile: Dockerfile
     image: geoserver-mcp:local
     environment:
