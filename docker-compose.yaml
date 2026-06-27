@@ -77,7 +77,12 @@ services:
   # lengkap, langsung skip. Mencegah "workspace hilang" saat volume
   # geoserver-data ter-reset — data mentah tetap aman di PostGIS.
   geoserver-init:
-    image: python:3.12-slim
+    # init.py di-bake ke image (build context relatif jalan di Coolify;
+    # bind-mount volume relatif TIDAK — dulu gagal "can't open /init/init.py").
+    build:
+      context: ./init
+      dockerfile: Dockerfile
+    image: geoserver-init:local
     depends_on:
       geoserver:
         condition: service_healthy
@@ -91,9 +96,6 @@ services:
       - PG_DB=${POSTGIS_DB:-geoserver}
       - PG_USER=${POSTGIS_USER:-geoserver}
       - PG_PASS=${POSTGIS_PASS:-geoserver}
-    volumes:
-      - ./init:/init:ro
-    command: ["python", "/init/init.py"]
     networks:
       - app-net
     restart: "no"
