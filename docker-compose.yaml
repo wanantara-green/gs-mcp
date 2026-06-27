@@ -68,7 +68,7 @@ services:
   geoserver-mcp:
     build:
       # Build context mengarah ke proyek geoserver-mcp yang berisi Dockerfile
-      context: ../../GEONODE-WSL/geoserver-mcp
+      context: geoserver-mcp
       dockerfile: Dockerfile
     image: geoserver-mcp:local
     environment:
