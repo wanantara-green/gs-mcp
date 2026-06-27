@@ -1,1 +1,1 @@
-# gs-mcp
+geoserver-mcp

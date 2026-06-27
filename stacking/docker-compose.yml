@@ -1,0 +1,94 @@
+# ──────────────────────────────────────────────────────────
+# Training 03 — Stacking: GeoServer + PostGIS + GeoServer MCP
+# ──────────────────────────────────────────────────────────
+# Stack minimal untuk belajar GeoServer WFS endpoint.
+#
+# QUICK START:
+#   cd stacking
+#   docker compose up -d --build
+#
+#   Service           URL                                  Notes
+#   ────────────────────────────────────────────────────────────────────
+#   GeoServer         http://localhost:9597/geoserver      admin / geoserver
+#   PostGIS           in-network host "postgis" port 5432  db/user/pass: geoserver
+#   GeoServer MCP     http://localhost:8000/sse            SSE endpoint
+#
+# Setelah container aktif:
+#   1. Login GeoServer  →  http://localhost:9597/geoserver
+#   2. Buat workspace   →  "zonasiluwu"
+#   3. Buat store/layer →  Akses WFS endpoint:
+#      http://localhost:9597/geoserver/zonasiluwu/ows?service=WFS&version=2.0.0&request=GetCapabilities
+# ──────────────────────────────────────────────────────────
+
+services:
+
+  # ── PostGIS Database ──────────────────────────────────
+  postgis:
+    image: kartoza/postgis:16-3.4
+    environment:
+      - POSTGRES_DB=${POSTGIS_DB:-geoserver}
+      - POSTGRES_USER=${POSTGIS_USER:-geoserver}
+      - POSTGRES_PASS=${POSTGIS_PASS:-geoserver}
+      - ALLOW_IP_RANGE=0.0.0.0/0
+      - POSTGRES_MULTIPLE_EXTENSIONS=postgis
+    volumes:
+      - postgis-data:/var/lib/postgresql
+    networks:
+      - app-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGIS_USER:-geoserver} -d ${POSTGIS_DB:-geoserver}"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # ── GeoServer ─────────────────────────────────────────
+  geoserver:
+    image: kartoza/geoserver:latest
+    depends_on:
+      postgis:
+        condition: service_healthy
+    ports:
+      - "9597:8080"
+    environment:
+      - GEOSERVER_ADMIN_USER=${GEOSERVER_ADMIN_USER:-admin}
+      - GEOSERVER_ADMIN_PASSWORD=${GEOSERVER_ADMIN_PASSWORD:-geoserver}
+    volumes:
+      - geoserver-data:/opt/geoserver_data
+    networks:
+      - app-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/geoserver/web/"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+    restart: unless-stopped
+
+  # ── GeoServer MCP (SSE) ───────────────────────────────
+  geoserver-mcp:
+    build:
+      # Build context mengarah ke proyek geoserver-mcp yang berisi Dockerfile
+      context: ../../GEONODE-WSL/geoserver-mcp
+      dockerfile: Dockerfile
+    image: geoserver-mcp:local
+    environment:
+      - GEOSERVER_URL=${GEOSERVER_URL:-http://geoserver:8080/geoserver}
+      - GEOSERVER_USER=${GEOSERVER_USER:-admin}
+      - GEOSERVER_PASSWORD=${GEOSERVER_PASSWORD:-geoserver}
+      - GEOSERVER_WORKSPACE=${GEOSERVER_WORKSPACE:-zonasiluwu}
+    ports:
+      - "127.0.0.1:8000:8000"       # SSE endpoint
+    depends_on:
+      geoserver:
+        condition: service_healthy
+    networks:
+      - app-net
+    restart: unless-stopped
+
+networks:
+  app-net:
+    driver: bridge
+
+volumes:
+  geoserver-data:
+  postgis-data:
