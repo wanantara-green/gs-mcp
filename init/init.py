@@ -35,14 +35,12 @@ PG_USER = os.environ.get("PG_USER", "geoserver")
 PG_PASS = os.environ.get("PG_PASS", "geoserver")
 PG_SCHEMA = os.environ.get("PG_SCHEMA", "public")
 
-# Sumber file SLD (repo training-02, public). Boleh dikosongkan untuk skip SLD.
-SLD_RAW_BASE = os.environ.get(
-    "SLD_RAW_BASE",
-    "https://raw.githubusercontent.com/wanantara-green/training-02/main/geojson",
-)
-SLD_API_DIR = os.environ.get(
-    "SLD_API_DIR",
-    "https://api.github.com/repos/wanantara-green/training-02/contents/geojson",
+# Sumber file SLD: folder LOKAL yang di-bake ke image (init/sld) — dulu ditarik
+# dari raw.githubusercontent training-02, kini dipindah ke repo ini agar tak ada
+# dependensi lintas-repo/jaringan & training-02 tak perlu menyimpan SLD lagi.
+SLD_DIR = os.environ.get(
+    "SLD_DIR",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "sld"),
 )
 
 _AUTH = "Basic " + base64.b64encode(f"{USER}:{PASS}".encode()).decode()
@@ -149,12 +147,11 @@ def published_featuretypes():
 
 def sld_filename_map():
     try:
-        _, body = req("GET", "", raw_url=SLD_API_DIR)
-        items = json.loads(body)
-        return {it["name"][:-4].lower(): it["name"]
-                for it in items if it.get("name", "").endswith(".sld")}
+        return {fn[:-4].lower(): fn
+                for fn in os.listdir(SLD_DIR) if fn.endswith(".sld")}
     except Exception as e:  # noqa: BLE001
-        print(f"[init] WARN: gagal ambil daftar SLD ({e}); SLD dilewati.", flush=True)
+        print(f"[init] WARN: gagal baca folder SLD {SLD_DIR} ({e}); SLD dilewati.",
+              flush=True)
         return {}
 
 
@@ -168,7 +165,8 @@ def publish_featuretype(table):
 
 def upload_style(table, filename):
     try:
-        _, sld = req("GET", "", raw_url=f"{SLD_RAW_BASE}/{filename}")
+        with open(os.path.join(SLD_DIR, filename), "r", encoding="utf-8") as f:
+            sld = f.read()
     except Exception:  # noqa: BLE001
         return None
     # Deklarasi versi SLD pada file = 1.1.0 tapi isi memakai konstruk SLD 1.0

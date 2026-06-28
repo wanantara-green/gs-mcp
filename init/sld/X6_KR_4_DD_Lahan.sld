@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StyledLayerDescriptor xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" version="1.1.0">
+<NamedLayer><Name>dd_lahan</Name><UserStyle><Title>DD Lahan — 3 Klas</Title><FeatureTypeStyle>
+<Rule><Name>Sangat Rendah</Name><ogc:Filter><ogc:PropertyIsEqualTo><ogc:PropertyName>kelas_nume</ogc:PropertyName><ogc:Literal>1</ogc:Literal></ogc:PropertyIsEqualTo></ogc:Filter><PolygonSymbolizer><Fill><CssParameter name="fill">#d7191c</CssParameter></Fill><Stroke><CssParameter name="stroke">#232323</CssParameter><CssParameter name="stroke-width">0.26</CssParameter></Stroke></PolygonSymbolizer></Rule>
+<Rule><Name>Rendah</Name><ogc:Filter><ogc:PropertyIsEqualTo><ogc:PropertyName>kelas_nume</ogc:PropertyName><ogc:Literal>2</ogc:Literal></ogc:PropertyIsEqualTo></ogc:Filter><PolygonSymbolizer><Fill><CssParameter name="fill">#fdae61</CssParameter></Fill><Stroke><CssParameter name="stroke">#232323</CssParameter><CssParameter name="stroke-width">0.26</CssParameter></Stroke></PolygonSymbolizer></Rule>
+<Rule><Name>Sedang</Name><ogc:Filter><ogc:PropertyIsEqualTo><ogc:PropertyName>kelas_nume</ogc:PropertyName><ogc:Literal>3</ogc:Literal></ogc:PropertyIsEqualTo></ogc:Filter><PolygonSymbolizer><Fill><CssParameter name="fill">#ffffbf</CssParameter></Fill><Stroke><CssParameter name="stroke">#232323</CssParameter><CssParameter name="stroke-width">0.26</CssParameter></Stroke></PolygonSymbolizer></Rule>
+</FeatureTypeStyle></UserStyle></NamedLayer></StyledLayerDescriptor>

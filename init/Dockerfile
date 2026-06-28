@@ -11,5 +11,8 @@ FROM python:3.12-slim
 ENV PYTHONUNBUFFERED=1
 WORKDIR /init
 COPY init.py /init/init.py
+# 30 file SLD di-bake ke image (sumber style GeoServer, dulu dari raw.githubusercontent
+# training-02). init.py membacanya dari /init/sld saat provisioning.
+COPY sld/ /init/sld/
 
 CMD ["python", "/init/init.py"]
