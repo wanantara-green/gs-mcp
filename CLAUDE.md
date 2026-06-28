@@ -61,6 +61,8 @@ There is no test suite, linter, or build script configured in this repo.
 
 - **Never bump the `geoserver` image tag back to `:latest`.** The pin exists because a major-version reinit destroys the catalog volume; the `geoserver-init` rebuild only covers workspace/datastore/featuretype/SLD, not styles/layers added manually.
 - **SLD files live in `init/sld/` and are baked into the `geoserver-init` image.** They used to be fetched from `raw.githubusercontent` of the `training-02` repo; do not reintroduce that dependency. SLD `version="1.1.0"` declarations are rewritten to `1.0.0` on upload (see `upload_style()` in `init/init.py`) — the file content uses SLD 1.0 constructs.
+- **GeoJSON in `seed/geojson/` is gitignored** (only `Dockerfile`, `seed.sh`, `README.md`, and `geojson/.gitignore` are tracked). The raw data lives in the sibling `wanantara-green/training-02` repo under `geojson/`. Do not `git add -f` the GeoJSON — it's ~164 MB and will bloat the repo.
+- **Do not re-add `-lco FID=id` to `seed/seed.sh`.** Several GeoJSON files have duplicate or non-integer `id` properties; forcing them into the PK causes `duplicate key` / `Wrong field type` failures. Default `ogc_fid` auto-increment works for all 30.
 - **`geoserver-mcp` is stdio-only.** Any change to how it's launched must go through `mcp-proxy` (see `geoserver-mcp/Dockerfile`). `--pass-environment` is required so the wrapped process inherits `GEOSERVER_*` vars.
 - **`gs-ai-bridge` read-only contract is enforced server-side**, not just by prompting. When adding tools, update the whitelist in `gs-ai-bridge/src/gs_ai_bridge/mcp_client.py` and `tools.py` — do not assume the model will respect a prompt-level restriction.
 - `.env` is gitignored (and was previously committed by mistake — see recent commit history). Secrets like `DEEPSEEK_API_KEY` belong in Coolify env vars, never in the repo.
@@ -73,3 +75,22 @@ Production runs on Coolify under `wanantara-green/gs-mcp` and exposes:
 - `https://training-02.wanantara.org` → consumer (separate repo `wanantara-green/training-02`, contains `map.html` + `js/config.js` pointing at the above URLs)
 
 The companion `training-02` repo is **not** in this working directory; if a task involves `map.html`, `js/config.js`, or GeoJSON fallbacks, those files live in that sibling repo.
+
+## Seeding production PostGIS (one-time per environment)
+
+Because `seed/geojson/*.geojson` is gitignored, a fresh Coolify deploy comes up with an empty `postgis-seed/geojson` folder and seeds nothing. **The GeoJSON must be placed on the server manually before the first `postgis-seed` run.** PostGIS is on a persistent volume (`postgis-data`), so this is genuinely a one-time step per environment.
+
+Recommended path on the Coolify host (`/workspace/gs-mcp/` per `catatan.md`):
+
+```bash
+cd /workspace/gs-mcp
+# Pull GeoJSON from the sibling repo (use GitHub token if private):
+git clone --depth=1 https://github.com/wanantara-green/training-02.git /tmp/t02
+cp /tmp/t02/geojson/*.geojson seed/geojson/
+rm -rf /tmp/t02
+
+docker compose up -d --build postgis-seed geoserver-init
+# Verify: [seed] selesai: total=30 import=30 ... ; [init] selesai: featuretype 30/30, style 30/30.
+```
+
+On subsequent redeploys, `postgis-seed` skips every table (idempotent) — no action needed unless GeoJSON changes (then re-run with `SEED_FORCE=1`).
