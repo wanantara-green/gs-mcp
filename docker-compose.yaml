@@ -77,6 +77,30 @@ services:
       retries: 10
     restart: unless-stopped
 
+  # ── PostGIS Seed (one-shot GeoJSON importer) ──────────
+  # Import semua *.geojson dari seed/geojson/ ke PostGIS. Idempoten: tabel
+  # yang sudah ada & berisi baris dilewati. Nama tabel = basename file
+  # di-lowercase, sengaja menyamai mapping SLD di init/init.py supaya
+  # geoserver-init bisa otomatis pasang style ke layer.
+  postgis-seed:
+    build:
+      context: ./seed
+      dockerfile: Dockerfile
+    image: postgis-seed:local
+    depends_on:
+      postgis:
+        condition: service_healthy
+    environment:
+      - PG_HOST=postgis
+      - PG_PORT=5432
+      - PG_DB=${POSTGIS_DB:-geoserver}
+      - PG_USER=${POSTGIS_USER:-geoserver}
+      - PG_PASS=${POSTGIS_PASS:-geoserver}
+      - FORCE=${SEED_FORCE:-0}
+    networks:
+      - app-net
+    restart: "no"
+
   # ── GeoServer Auto-Provisioner (self-healing) ─────────
   # Membangun ulang katalog GeoServer (workspace + datastore PostGIS +
   # 30 layer + 30 SLD) secara IDEMPOTEN setiap deploy. Jika katalog sudah
@@ -92,6 +116,8 @@ services:
     depends_on:
       geoserver:
         condition: service_healthy
+      postgis-seed:
+        condition: service_completed_successfully
     environment:
       - GEOSERVER_URL=${GEOSERVER_URL:-http://geoserver:8080/geoserver}
       - GEOSERVER_USER=${GEOSERVER_USER:-admin}
