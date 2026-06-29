@@ -61,7 +61,7 @@ There is no test suite, linter, or build script configured in this repo.
 
 - **Never bump the `geoserver` image tag back to `:latest`.** The pin exists because a major-version reinit destroys the catalog volume; the `geoserver-init` rebuild only covers workspace/datastore/featuretype/SLD, not styles/layers added manually.
 - **SLD files live in `init/sld/` and are baked into the `geoserver-init` image.** They used to be fetched from `raw.githubusercontent` of the `training-02` repo; do not reintroduce that dependency. SLD `version="1.1.0"` declarations are rewritten to `1.0.0` on upload (see `upload_style()` in `init/init.py`) — the file content uses SLD 1.0 constructs.
-- **GeoJSON in `seed/geojson/` is gitignored** (only `Dockerfile`, `seed.sh`, `README.md`, and `geojson/.gitignore` are tracked). The raw data lives in the sibling `wanantara-green/training-02` repo under `geojson/`. Do not `git add -f` the GeoJSON — it's ~164 MB and will bloat the repo.
+- **GeoJSON in `seed/geojson/` is gitignored** (only `Dockerfile`, `seed.sh`, `README.md`, and `geojson/.gitignore` are tracked). Do not `git add -f` the GeoJSON — it's ~164 MB and will bloat the repo. **Source of truth for the data is the maintainer's shapefiles**, which are converted to GeoJSON (shp→geojson) and dropped into `seed/geojson/` by hand. The files are regenerable any time, so they are the canonical backup/restore path — there is no DB dump to keep in sync. (The 30 files are also recoverable from the `training-02` repo git history at `3e00032^`, before that repo's `geojson/` folder was deleted — but the maintainer's shapefiles are the upstream source.)
 - **Do not re-add `-lco FID=id` to `seed/seed.sh`.** Several GeoJSON files have duplicate or non-integer `id` properties; forcing them into the PK causes `duplicate key` / `Wrong field type` failures. Default `ogc_fid` auto-increment works for all 30.
 - **`geoserver-mcp` is stdio-only.** Any change to how it's launched must go through `mcp-proxy` (see `geoserver-mcp/Dockerfile`). `--pass-environment` is required so the wrapped process inherits `GEOSERVER_*` vars.
 - **`gs-ai-bridge` read-only contract is enforced server-side**, not just by prompting. When adding tools, update the whitelist in `gs-ai-bridge/src/gs_ai_bridge/mcp_client.py` and `tools.py` — do not assume the model will respect a prompt-level restriction.
@@ -84,10 +84,10 @@ Recommended path on the Coolify host (`/workspace/gs-mcp/` per `catatan.md`):
 
 ```bash
 cd /workspace/gs-mcp
-# Pull GeoJSON from the sibling repo (use GitHub token if private):
-git clone --depth=1 https://github.com/wanantara-green/training-02.git /tmp/t02
-cp /tmp/t02/geojson/*.geojson seed/geojson/
-rm -rf /tmp/t02
+# Place the GeoJSON into seed/geojson/ from your own copy. The maintainer keeps
+# these regenerated from shapefiles (shp→geojson); copy them up to the host, e.g.:
+#   scp ./seed/geojson/*.geojson user@host:/workspace/gs-mcp/seed/geojson/
+# (Do NOT clone training-02 for this — its geojson/ folder was removed in 3e00032.)
 
 docker compose up -d --build postgis-seed geoserver-init
 # Verify: [seed] selesai: total=30 import=30 ... ; [init] selesai: featuretype 30/30, style 30/30.

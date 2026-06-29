@@ -36,6 +36,13 @@ docker compose run --rm -e FORCE=1 postgis-seed
 
 ## Sumber data
 
-30 GeoJSON aslinya tersimpan di repo `wanantara-green/training-02` di folder
-`geojson/`. Repo ini tidak ikut menyertakan datanya — copy/clone secara manual
-sesuai kebutuhan deployment.
+**Sumber kebenaran = shapefile milik maintainer**, dikonversi ke GeoJSON
+(shp→geojson) lalu ditaruh manual di `seed/geojson/`. File ini bisa
+di-regenerate kapan saja, jadi inilah jalur backup/restore kanonik — tidak ada
+DB dump yang perlu dijaga sinkron.
+
+Repo ini sengaja **tidak** menyertakan GeoJSON-nya (`seed/geojson/` gitignored,
+±164 MB) — copy file ke folder ini secara manual sesuai kebutuhan deployment.
+(Sebagai cadangan, ke-30 file juga masih bisa diambil dari git history repo
+`wanantara-green/training-02` pada `3e00032^`, sebelum folder `geojson/`-nya
+dihapus — tapi shapefile maintainer adalah sumber hulunya.)
