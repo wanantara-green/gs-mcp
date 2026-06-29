@@ -1,0 +1,482 @@
+/* ============================================================================
+   admin_extra.css — Tema "Claude" untuk Django Admin (di atas kerangka Jazzmin)
+   Palet khas Anthropic/Claude: kanvas krem, aksen clay/terracotta, tinta hangat.
+   Tujuan: mengganti tampilan default Jazzmin & menyembunyikan branding-nya.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --claude-canvas:    #F0EEE6;  /* latar utama (kanvas Claude) */
+    --claude-paper:     #FAF9F5;  /* kartu / panel */
+    --claude-white:     #FFFFFF;
+    --claude-clay:      #C96442;  /* aksen utama (clay/terracotta) */
+    --claude-clay-600:  #B0532F;  /* hover */
+    --claude-clay-700:  #934429;
+    --claude-clay-soft: #F5E6DE;  /* clay sangat muda untuk highlight */
+    --claude-ink:       #2B2A26;  /* teks utama */
+    --claude-ink-soft:  #5C5A52;  /* teks sekunder */
+    --claude-muted:     #8A887F;  /* teks redup */
+    --claude-border:    #E2DFD4;  /* garis pemisah */
+    --claude-border-2:  #D6D2C4;
+    --claude-dark:      #2A2925;  /* sidebar gelap hangat */
+    --claude-dark-2:    #34322D;  /* hover sidebar */
+    --claude-dark-text: #C9C6BB;  /* teks pada sidebar */
+    --claude-danger:    #A6492F;  /* merah bata hangat */
+    --claude-danger-600:#8C3B25;
+    --claude-ok:        #5C6B4A;  /* hijau moss (status valid) */
+    --claude-ok-soft:   #EAEDE2;
+}
+
+/* ---------- Dasar ---------- */
+body,
+.wrapper,
+.content-wrapper {
+    background-color: var(--claude-canvas) !important;
+    color: var(--claude-ink) !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+a {
+    color: var(--claude-clay) !important;
+}
+a:hover {
+    color: var(--claude-clay-700) !important;
+}
+
+h1, h2, h3, h4, h5,
+.content-header h1,
+.card-title {
+    font-family: 'Fraunces', Georgia, serif !important;
+    color: var(--claude-ink) !important;
+    letter-spacing: -0.01em;
+}
+
+/* ---------- Navbar atas ---------- */
+.main-header.navbar {
+    background-color: var(--claude-paper) !important;
+    border-bottom: 1px solid var(--claude-border) !important;
+    box-shadow: none !important;
+}
+.main-header .nav-link,
+.main-header .navbar-nav .nav-link {
+    color: var(--claude-ink-soft) !important;
+}
+.main-header .nav-link:hover {
+    color: var(--claude-clay) !important;
+}
+/* Kotak pencarian di navbar */
+.navbar .form-control,
+.navbar .input-group .form-control {
+    background-color: var(--claude-canvas) !important;
+    border: 1px solid var(--claude-border-2) !important;
+    color: var(--claude-ink) !important;
+    border-radius: 8px !important;
+}
+
+/* ---------- Sidebar ---------- */
+.main-sidebar,
+.main-sidebar .sidebar {
+    background-color: var(--claude-dark) !important;
+}
+.brand-link {
+    background-color: var(--claude-dark) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+    color: var(--claude-white) !important;
+    font-family: 'Fraunces', Georgia, serif !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.01em;
+}
+.brand-link .brand-image { box-shadow: none !important; }
+
+.sidebar .nav-sidebar .nav-link {
+    color: var(--claude-dark-text) !important;
+    border-radius: 8px !important;
+    margin: 2px 8px !important;
+}
+.sidebar .nav-sidebar .nav-link p { color: inherit !important; }
+.sidebar .nav-sidebar .nav-link:hover {
+    background-color: var(--claude-dark-2) !important;
+    color: var(--claude-white) !important;
+}
+.sidebar .nav-sidebar .nav-link.active {
+    background-color: var(--claude-clay) !important;
+    color: var(--claude-white) !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+.sidebar .nav-header {
+    color: var(--claude-muted) !important;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+}
+.user-panel .info a { color: var(--claude-white) !important; }
+
+/* ---------- Kartu / panel ---------- */
+.card {
+    background-color: var(--claude-paper) !important;
+    border: 1px solid var(--claude-border) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 1px 2px rgba(43,42,38,0.04) !important;
+}
+.card-header {
+    background-color: transparent !important;
+    border-bottom: 1px solid var(--claude-border) !important;
+}
+.card-primary.card-outline { border-top: 3px solid var(--claude-clay) !important; }
+
+/* ---------- Tombol ---------- */
+.btn {
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    border: 1px solid transparent !important;
+}
+/* Simpan (success) → clay penuh */
+.btn-success {
+    background-color: var(--claude-clay) !important;
+    border-color: var(--claude-clay) !important;
+    color: #fff !important;
+}
+.btn-success:hover {
+    background-color: var(--claude-clay-600) !important;
+    border-color: var(--claude-clay-600) !important;
+}
+/* Info (Simpan dan tambah / edit) → outline clay lembut */
+.btn-info {
+    background-color: var(--claude-clay-soft) !important;
+    border-color: var(--claude-border-2) !important;
+    color: var(--claude-clay-700) !important;
+}
+.btn-info:hover {
+    background-color: #EEDBD1 !important;
+    color: var(--claude-clay-700) !important;
+}
+/* Primary umum → clay */
+.btn-primary {
+    background-color: var(--claude-clay) !important;
+    border-color: var(--claude-clay) !important;
+    color: #fff !important;
+}
+.btn-primary:hover {
+    background-color: var(--claude-clay-600) !important;
+    border-color: var(--claude-clay-600) !important;
+}
+/* Hapus (danger) → merah bata hangat */
+.btn-danger {
+    background-color: var(--claude-danger) !important;
+    border-color: var(--claude-danger) !important;
+    color: #fff !important;
+}
+.btn-danger:hover {
+    background-color: var(--claude-danger-600) !important;
+    border-color: var(--claude-danger-600) !important;
+}
+/* Sekunder / Riwayat → tan netral */
+.btn-secondary {
+    background-color: var(--claude-canvas) !important;
+    border-color: var(--claude-border-2) !important;
+    color: var(--claude-ink) !important;
+}
+.btn-secondary:hover { background-color: #E7E4DA !important; }
+
+/* ---------- Tautan & breadcrumb ---------- */
+.breadcrumb { background-color: transparent !important; }
+.content-header .breadcrumb-item a { color: var(--claude-clay) !important; }
+.content-header .breadcrumb-item.active { color: var(--claude-muted) !important; }
+
+/* ---------- Tabel ---------- */
+.table thead th {
+    background-color: var(--claude-canvas) !important;
+    color: var(--claude-ink-soft) !important;
+    border-bottom: 1px solid var(--claude-border-2) !important;
+}
+.table td, .table th { border-color: var(--claude-border) !important; }
+.table-hover tbody tr:hover { background-color: var(--claude-clay-soft) !important; }
+
+/* Tautan baris hasil (changelist) */
+#result_list a { color: var(--claude-clay) !important; }
+
+/* ---------- Input form ---------- */
+.form-control,
+.vTextField, .vTextArea, select, textarea, input[type="text"],
+input[type="number"], input[type="email"], input[type="password"] {
+    background-color: var(--claude-white) !important;
+    border: 1px solid var(--claude-border-2) !important;
+    color: var(--claude-ink) !important;
+    border-radius: 8px !important;
+}
+.form-control:focus,
+input:focus, select:focus, textarea:focus {
+    border-color: var(--claude-clay) !important;
+    box-shadow: 0 0 0 3px rgba(201,100,66,0.15) !important;
+}
+
+/* Tab changeform */
+.nav-tabs .nav-link.active {
+    color: var(--claude-clay) !important;
+    border-bottom: 2px solid var(--claude-clay) !important;
+    background: transparent !important;
+}
+.nav-tabs .nav-link { color: var(--claude-ink-soft) !important; }
+
+/* Badge tipologi / boolean */
+.badge-success, .bg-success { background-color: var(--claude-clay) !important; }
+
+/* ---------- Halaman login (gaya Claude) ---------- */
+.login-page {
+    background:
+        radial-gradient(120% 80% at 15% -10%, #F7F3E9 0%, rgba(247,243,233,0) 55%),
+        radial-gradient(110% 70% at 95% 0%, #EDE6D6 0%, rgba(237,230,214,0) 50%),
+        var(--claude-canvas) !important;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+}
+.login-box {
+    background-color: transparent !important;
+    width: 380px; max-width: 92vw;
+}
+
+/* Logo: batasi ukuran (default render 375px → kebesaran) & beri bingkai lembut */
+.login-logo { margin-bottom: 1.25rem !important; }
+.login-logo a, .login-logo { color: var(--claude-ink) !important; }
+.login-box img,
+.login-logo img {
+    width: 64px !important; height: 64px !important;
+    max-width: 64px !important;
+    object-fit: contain;
+    display: inline-block;
+    padding: 12px;
+    background: var(--claude-paper) !important;
+    border: 1px solid var(--claude-border) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 8px 24px -16px rgba(43,42,38,.45) !important;
+}
+
+/* Kartu login */
+.login-card-body, .card.card-outline {
+    background-color: var(--claude-paper) !important;
+    border: 1px solid var(--claude-border) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 20px 48px -28px rgba(43,42,38,.40) !important;
+    padding: 2rem 1.9rem !important;
+}
+.login-box-msg, .login-card-body .login-box-msg {
+    font-family: 'Fraunces', Georgia, serif !important;
+    font-weight: 600 !important;
+    font-size: 1.18rem !important;
+    color: var(--claude-ink) !important;
+    letter-spacing: -0.01em;
+    padding: 0 0 1.25rem !important;
+}
+
+/* Ikon append pada input login */
+.login-card-body .input-group-text {
+    background-color: var(--claude-canvas) !important;
+    border: 1px solid var(--claude-border-2) !important;
+    border-left: none !important;
+    color: var(--claude-muted) !important;
+    border-radius: 0 8px 8px 0 !important;
+}
+.login-card-body .input-group .form-control {
+    border-right: none !important;
+    border-radius: 8px 0 0 8px !important;
+    height: calc(2.6rem + 2px);
+}
+.login-card-body .input-group:focus-within .input-group-text {
+    border-color: var(--claude-clay) !important;
+    color: var(--claude-clay) !important;
+}
+.login-card-body .input-group:focus-within .form-control {
+    border-color: var(--claude-clay) !important;
+}
+
+/* Tombol "Masuk" → clay penuh, lega */
+.login-card-body .btn-primary {
+    height: 2.8rem; font-weight: 600 !important;
+    letter-spacing: 0.01em; border-radius: 10px !important;
+    margin-top: .4rem;
+}
+
+/* Netralkan latar lavender autofill Chrome → tetap putih hangat */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--claude-ink) !important;
+    -webkit-box-shadow: 0 0 0 1000px var(--claude-white) inset !important;
+    caret-color: var(--claude-ink) !important;
+    transition: background-color 9999s ease-in-out 0s;
+}
+
+/* ---------- Footer: sembunyikan branding Jazzmin ---------- */
+.main-footer { background-color: var(--claude-paper) !important; border-top: 1px solid var(--claude-border) !important; color: var(--claude-ink-soft) !important; }
+/* "Jazzmin version x.y.z" berada di div float-right footer → sembunyikan */
+.main-footer .float-right { display: none !important; }
+
+/* ============================================================================
+   Halaman dalam — Dashboard, Changelist, Changeform (gaya Claude)
+   ========================================================================== */
+
+/* ---------- Dashboard (index) ---------- */
+.content-wrapper .content-header h1 { font-size: 1.6rem !important; }
+.small-box, .info-box, .card { transition: transform .25s cubic-bezier(.2,.7,.2,1), box-shadow .25s, border-color .25s; }
+.dashboard .card:hover,
+.app-list .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px -22px rgba(43,42,38,.5) !important;
+    border-color: var(--claude-border-2) !important;
+}
+/* Tautan model di kartu app dashboard */
+.app-list .card a, .dashboard a.d-block { color: var(--claude-ink) !important; }
+.app-list .card a:hover { color: var(--claude-clay) !important; }
+
+/* ---------- Object tools (tombol "Tambah …") ---------- */
+.object-tools a, .object-tools a:link, .object-tools a:visited {
+    background: var(--claude-clay) !important;
+    color: #fff !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--claude-clay) !important;
+    box-shadow: none !important;
+    font-weight: 500 !important;
+}
+.object-tools a:hover { background: var(--claude-clay-600) !important; }
+
+/* ---------- Changelist: search ---------- */
+#changelist-search .form-control,
+#searchbar {
+    background: var(--claude-white) !important;
+    border: 1px solid var(--claude-border-2) !important;
+    border-radius: 8px !important;
+}
+#changelist-search .btn,
+#changelist-search input[type="submit"] {
+    background: var(--claude-clay) !important;
+    border-color: var(--claude-clay) !important;
+    color: #fff !important; border-radius: 8px !important;
+}
+
+/* ---------- Changelist: result list ---------- */
+#result_list { border-radius: 12px; overflow: hidden; }
+#result_list tbody tr:nth-child(odd) { background: rgba(255,255,255,.45); }
+#result_list tbody tr:hover { background: var(--claude-clay-soft) !important; }
+#result_list th, #result_list td { border-color: var(--claude-border) !important; }
+.changelist-form-container .card,
+#changelist .card { overflow: hidden; }
+
+/* Boolean is_valid (Jazzmin pakai font-awesome) */
+.fa-check-circle, .fa-check, td .text-success, .text-success { color: var(--claude-ok) !important; }
+.fa-times-circle, .fa-times, td .text-danger, .text-danger { color: var(--claude-danger) !important; }
+/* Django default boolean svg → samarkan warna via filter hangat */
+img[src*="icon-yes"] { filter: sepia(.4) saturate(1.6) hue-rotate(35deg) brightness(.85); }
+img[src*="icon-no"]  { filter: sepia(.6) saturate(2)   hue-rotate(-20deg) brightness(.8); }
+
+/* ---------- Paginasi ---------- */
+.paginator { border-top: 1px solid var(--claude-border) !important; color: var(--claude-muted) !important; }
+.pagination .page-link, .paginator a {
+    color: var(--claude-clay) !important;
+    border: 1px solid var(--claude-border-2) !important;
+    border-radius: 8px !important; margin: 0 2px;
+}
+.pagination .page-item.active .page-link,
+.paginator .this-page {
+    background: var(--claude-clay) !important;
+    border-color: var(--claude-clay) !important;
+    color: #fff !important; border-radius: 8px; padding: 2px 9px;
+}
+
+/* ---------- Filter (Jazzmin dropdown & sidebar klasik) ---------- */
+#changelist-filter { background: var(--claude-paper) !important; border: 1px solid var(--claude-border) !important; border-radius: 12px !important; }
+#changelist-filter h2, #changelist-filter h3 { color: var(--claude-ink-soft) !important; background: transparent !important; }
+#changelist-filter a { color: var(--claude-ink-soft) !important; }
+#changelist-filter li.selected a, #changelist-filter a.selected { color: var(--claude-clay) !important; font-weight: 600 !important; }
+.dropdown-menu { background: var(--claude-paper) !important; border: 1px solid var(--claude-border) !important; border-radius: 10px !important; box-shadow: 0 12px 28px -18px rgba(43,42,38,.4) !important; }
+.dropdown-menu .dropdown-item:hover { background: var(--claude-clay-soft) !important; color: var(--claude-clay-700) !important; }
+.dropdown-menu .dropdown-item.active, .dropdown-menu .active > .dropdown-item { background: var(--claude-clay) !important; }
+
+/* ---------- Select2 (dropdown tipologi) ---------- */
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+    background: var(--claude-white) !important;
+    border: 1px solid var(--claude-border-2) !important;
+    border-radius: 8px !important; min-height: 38px;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 36px !important; color: var(--claude-ink) !important; }
+.select2-container--default.select2-container--focus .select2-selection { border-color: var(--claude-clay) !important; box-shadow: 0 0 0 3px rgba(201,100,66,.15) !important; }
+.select2-dropdown { background: var(--claude-paper) !important; border: 1px solid var(--claude-border-2) !important; border-radius: 10px !important; }
+.select2-results__option--highlighted[aria-selected],
+.select2-container--default .select2-results__option--highlighted { background: var(--claude-clay) !important; color: #fff !important; }
+.select2-search--dropdown .select2-search__field { border: 1px solid var(--claude-border-2) !important; border-radius: 6px !important; }
+
+/* ---------- Changeform: fieldset / modul ---------- */
+.module, fieldset.module { background: var(--claude-paper) !important; border: 1px solid var(--claude-border) !important; border-radius: 12px !important; }
+.module > h2, fieldset > h2 {
+    background: var(--claude-canvas) !important;
+    color: var(--claude-ink) !important;
+    font-family: 'Fraunces', Georgia, serif !important;
+    border-bottom: 1px solid var(--claude-border) !important;
+    border-radius: 12px 12px 0 0 !important;
+}
+.form-row { border-color: var(--claude-border) !important; }
+label, .form-group label { color: var(--claude-ink-soft) !important; font-weight: 500 !important; }
+.help, .form-text, small.text-muted { color: var(--claude-muted) !important; }
+
+/* ---------- Submit row ---------- */
+.submit-row {
+    background: var(--claude-paper) !important;
+    border: 1px solid var(--claude-border) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 1px 2px rgba(43,42,38,.04) !important;
+}
+.submit-row input[type="submit"], .submit-row .default {
+    background: var(--claude-clay) !important; border-color: var(--claude-clay) !important;
+    color: #fff !important; border-radius: 8px !important; font-weight: 500 !important;
+}
+.submit-row input[type="submit"]:hover, .submit-row .default:hover { background: var(--claude-clay-600) !important; }
+.submit-row a.deletelink {
+    background: var(--claude-danger) !important; color: #fff !important;
+    border-radius: 8px !important; padding: 8px 14px !important;
+}
+
+/* ---------- Pesan / alert ---------- */
+.alert-success, .messagelist .success { background: var(--claude-ok-soft) !important; color: #3c4a30 !important; border: 1px solid #cdd6bf !important; border-radius: 10px !important; }
+.alert-warning, .messagelist .warning { background: var(--claude-clay-soft) !important; color: var(--claude-clay-700) !important; border: 1px solid #ecd2c4 !important; border-radius: 10px !important; }
+.alert-danger, .alert-error, .messagelist .error { background: #F3E0DA !important; color: var(--claude-danger-600) !important; border: 1px solid #e6c4b9 !important; border-radius: 10px !important; }
+
+/* ============================================================================
+   Perbaikan tabel inline (Pairwise values) — kolom "Block" jangan terpotong
+   ========================================================================== */
+.inline-group .tabular,
+.inline-group .djn-tabular {
+    overflow-x: auto;
+    display: block;
+    width: 100%;
+}
+.inline-group .tabular table {
+    width: 100%;
+    table-layout: auto;
+    border-collapse: collapse;
+}
+.inline-group .tabular th.column-block,
+.inline-group .tabular td.field-block {
+    min-width: 240px;
+    white-space: nowrap;
+}
+.inline-group .tabular td.field-block select,
+.inline-group .tabular select {
+    width: 100%;
+    min-width: 220px;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+}
+.inline-group .tabular th,
+.inline-group .tabular td {
+    overflow: visible;
+    vertical-align: middle;
+    padding: 6px 10px;
+}
+.inline-group .tabular td.field-i input,
+.inline-group .tabular td.field-j input,
+.inline-group .tabular td.field-value input {
+    max-width: 110px;
+}

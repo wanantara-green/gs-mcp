@@ -177,6 +177,40 @@ services:
       - app-net
     restart: unless-stopped
 
+  # ── AHP-MCE Backend (Django/DRF) ──────────────────────
+  # API kuisioner pembobotan AHP untuk frontend mce-index & mce-hasil
+  # (TRAINING-02). Memakai instance Postgres yang sama dgn PostGIS, tetapi
+  # database TERPISAH "ahp_mce" (dibuat otomatis oleh entrypoint). Skema +
+  # data awal 15 pakar/420 pairwise di-seed oleh migrasi Django (fixture).
+  # Prod: Traefik route domain (mis. mce-api.app.wanantara.org) -> 8000.
+  ahp-backend:
+    build:
+      context: ./ahp-backend
+      dockerfile: Dockerfile
+    image: ahp-backend:local
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-dev-insecure-change-me}   # set di Coolify utk prod
+      - DJANGO_DEBUG=${DJANGO_DEBUG:-0}
+      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-mce-api.app.wanantara.org,localhost,127.0.0.1,ahp-backend}
+      - POSTGRES_DB=${AHP_DB:-ahp_mce}
+      - POSTGRES_USER=${POSTGIS_USER:-geoserver}
+      - POSTGRES_PASSWORD=${POSTGIS_PASS:-geoserver}
+      - POSTGRES_HOST=postgis
+      - POSTGRES_PORT=5432
+      - CORS_ALLOWED_ORIGINS=${AHP_CORS_ORIGINS:-https://training-02.wanantara.org,http://localhost:8033}
+      - CSRF_TRUSTED_ORIGINS=${AHP_CSRF_ORIGINS:-https://training-02.wanantara.org,https://mce-api.app.wanantara.org}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}                          # opsional (narasi AI)
+      - FRONTEND_BASE_URL=${FRONTEND_BASE_URL:-https://training-02.wanantara.org}  # tautan topmenu admin
+      - ADMIN_PASSWORD=${AHP_ADMIN_PASSWORD:-}                            # sandi CRUD panel admin frontend (set di Coolify)
+    expose:
+      - "8000"                       # Traefik route ke 8000 (HTTPS domain via Coolify)
+    depends_on:
+      postgis:
+        condition: service_healthy
+    networks:
+      - app-net
+    restart: unless-stopped
+
 networks:
   app-net:
     driver: bridge
